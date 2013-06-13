@@ -8,9 +8,9 @@ Copyright 2013 Dwon_zol_bizhi
 下载中关村壁纸站的JPG格式的壁纸
 
 author    	=	"Sam Huang"
-name    		=	"Down_zol_bizhi"
-version 		=   "1.0.1"
-url 			=	"http://www.hiadmin.org"
+name    	=	"Down_zol_bizhi"
+version 	=	"1.0.1"
+url 		=	"http://www.hiadmin.org"
 author_email	=	"sam.hxq@gmail.com"
 
 
