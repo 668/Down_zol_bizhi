@@ -9,7 +9,7 @@ Copyright 2013 Dwon_zol_bizhi
 
 author  	=	"Sam Huang"
 name    	=	"Down_zol_bizhi"
-version 	=   "1.0.1"
+version 	=   	"1.0.2"
 url 		=	"http://www.hiadmin.org"
 author_email	=	"sam.hxq@gmail.com"
 
