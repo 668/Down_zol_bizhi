@@ -9,7 +9,7 @@ Copyright 2013 Dwon_zol_bizhi
 
 author  	=	"Sam Huang"
 name    	=	"Down_zol_bizhi"
-version 	=   	"1.0.2"
+version 	=   "1.0.3"
 url 		=	"http://www.hiadmin.org"
 author_email	=	"sam.hxq@gmail.com"
 
@@ -64,7 +64,8 @@ def zol_page_next(url):
 	@zol_bizhi_name	:图片分组名称，用于在本地建立文件夹来存放此分组的图片
 	@page_next 		:提取分析之后的本组图片的下一张图片地址
 	"""
-	zol_name_regex = r"(<h3>.*>)(.*)(</a><span>)"
+
+	zol_name_regex = r"(<h3>.*>)(.*[\u4e00-\u9fa5]+)" #提取壁纸分类名称
 	page_next_regex = r"(id=\"pageNext\".*href=\")(/bizhi/\d+_\d+_\d+.html)\"\s(title=\"点击浏览下一张)"
 	r = requests.get(url)
 	if r.status_code == 200:
@@ -72,7 +73,9 @@ def zol_page_next(url):
 		global zol_bizhi_name
         #判断是否能找到图片分类名称
 		if re.search(zol_name_regex,r_txt) !=None:
-			zol_bizhi_name = re.search(zol_name_regex,r_txt).group(2) 
+			zol_bizhi_name = re.search(zol_name_regex,r_txt).group(2)
+
+
 		#如果正则表达式返回不为None就认为匹配成功
 		if re.search(page_next_regex,r_txt).group() != None:
 			page_next_temp = re.search(page_next_regex,r_txt).group(2)
@@ -102,8 +105,7 @@ def down_zol_jpg(url,resolution="1920x1080"):
 	#匹配完成之后我们用.group(2)来提取需要的第二个()里面的内容
 	regex_resolution = r"(id=\"%s\" href=\")(/showpic/\d+x\d+_\d+_\d+.html)"%resolution
 
-	#当使用group()的时候就是完整的url地址、group(2)+group(3)的就是提取图片文件名
-	#zol_jpg_regex = "(http://.*/)(\d+)(.jpg|.png|.jpeg)"
+	#当使用group()的时候就是完整的url地址、group(2)的就是提取图片文件名
 	zol_jpg_regex = "(http://.*/)(\d+.png|\d+.jpg|\d+.jpeg)"
 
 	r1 = requests.get(url)
@@ -126,23 +128,18 @@ def down_zol_jpg(url,resolution="1920x1080"):
 					#如果不为None就说明能正则表达式能正确提取内容
 					zol_jpg_url = re.search(zol_jpg_regex,r2_txt).group() #jpg图片的URL地址
 					zol_jpg_name = re.search(zol_jpg_regex,r2_txt).group(2)
-									#re.search(zol_jpg_regex,r2_txt).group(3)
 					#J图片文件名
 					print ("JpgUrl: ",zol_jpg_url)
 					url_jpg = requests.get(zol_jpg_url)
 					if url_jpg.status_code == 200: 
-					#如果能正常打开图片的url就开始下载
 					#如果本地已存在此文件即不用再次下载、
 					#用requests的.content功能吧图片写入到本地
 						if os.path.exists("%s/%s"%(zol_bizhi_name,zol_jpg_name)) == False:
-							with open("%s/%s"%(zol_bizhi_name,zol_jpg_name),"wb") as code:
+							with open(r"%s/%s"%(zol_bizhi_name,zol_jpg_name),"wb") as code:
 								code.write(url_jpg.content)
 
 				else:
 					print (".....NO JPG Or PNG Photo......")
-					
-
-
 		else:
 			print ("没有这个分辨率，请重新设置分辨率。")
 			print (".....NO is resolution....")
@@ -158,7 +155,7 @@ if __name__ == "__main__":
 	item_list = [] 用于存放分类图片地址、zol_bizhi_url_list的数据将写入此列表中
 	range(1,10),从第一页开始到第十页结束，并将zol_url_list函数返回的列表内容写入到item_list中
 	"""
-	for i in range(1,20):
+	for i in range(1,35):
 		#url = "http://desk.zol.com.cn/pc/%s.html"%i  #最新更新
 		#url = "http://desk.zol.com.cn/pc/good_%s.html"%i  #最多推荐
 		url = "http://desk.zol.com.cn/pc/hot_%s.html"%i   #最多下载
@@ -180,7 +177,6 @@ if __name__ == "__main__":
 			#将函数zol_page_next返回的值写入到list中,并用len()和len(set())进行判断是否相等
 			#如果不相等即说明list中有重复值，即本分组的图片地址已经全部提取出来。
 			if len(url_list) == len(set(url_list)):
-				#zol_page_next(jpg_url)
 				#判断本地是否已经存在此文件夹，如果不存在就创建此文件夹
 				if os.path.exists("%s"%zol_bizhi_name) == False:
 					zol_bizhi_name = os.mkdir("%s"%zol_bizhi_name)
